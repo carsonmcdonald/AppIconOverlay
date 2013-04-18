@@ -65,7 +65,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     {
         int option_index = 0;
         
-        switch(getopt_long(argc, (char **)argv, "iothp", long_options, &option_index))
+        switch(getopt_long(argc, (char **)argv, "i:o:t:h:p:", long_options, &option_index))
         {
             case -1:
             {
@@ -97,10 +97,12 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
                 overlayContext.bannerHeightPadding = optarg == nil ? -1.0 : atof(optarg);
             } break;
 
+            case '?':
             default:
             {
                 usage((char*)argv[0]);
                 optionError = YES;
+                done = YES;
             }
         }
     } while(!done);
