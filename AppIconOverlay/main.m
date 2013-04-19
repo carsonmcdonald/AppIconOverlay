@@ -177,13 +177,21 @@ int main(int argc, const char *argv[])
             
             [bannerOverlayBuilder createGradientOverlayBanner];
             
-            [fontOverlayBuilder drawTextOverlay];
+            bool textDidFit = [fontOverlayBuilder drawTextOverlay];
             
             [bannerOverlayBuilder rotateOverlayBannerAndApplyToFinalImage];
             
             [CGUtils writeImageFromContext:overlayContext toFilename:overlayContext.outputFilename];
             
-            exitCode = 0;
+            if(textDidFit)
+            {
+                exitCode = 0;
+            }
+            else
+            {
+                fprintf(stderr, "WARNING: Full text did not fit into banner.\n");
+                exitCode = 2;
+            }
         }
         else
         {

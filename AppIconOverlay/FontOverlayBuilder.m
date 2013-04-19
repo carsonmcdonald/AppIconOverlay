@@ -61,7 +61,7 @@
     return range.length == CFAttributedStringGetLength(attrStr);
 }
 
-- (void)drawTextOverlay
+- (bool)drawTextOverlay
 {
     // Compute the shortest size of the label, this only works when the label is at 45 degrees
     CGFloat rotHyp = (hypot(overlayContext.inputImageSize.width, overlayContext.inputImageSize.height) - overlayContext.inputImageSize.height)/2.0;
@@ -110,6 +110,8 @@
     CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, CFAttributedStringGetLength(attrStr)), path, NULL);
     
     CTFrameDraw(frame, overlayContext.bannerContext);
+    
+    return range.length == CFAttributedStringGetLength(attrStr);
 }
 
 @end

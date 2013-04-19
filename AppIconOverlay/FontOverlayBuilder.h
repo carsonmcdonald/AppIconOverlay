@@ -24,6 +24,6 @@
 
 - (id)initWithOverlayContext:(OverlayContext *)oc;
 
-- (void)drawTextOverlay;
+- (bool)drawTextOverlay;
 
 @end
