@@ -195,7 +195,7 @@ int main(int argc, const char *argv[])
         }
         else
         {
-            exitCode = -1;
+            exitCode = 1;
         }
     }
     
