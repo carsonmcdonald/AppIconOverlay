@@ -28,6 +28,7 @@
 #import "BannerOverlayBuilder.h"
 #import "CGUtils.h"
 #import "FontOverlayBuilder.h"
+#import "config.h"
 
 static struct option long_options[] =
 {
@@ -36,6 +37,7 @@ static struct option long_options[] =
     {"text",      required_argument,    NULL,   't'},
     {"height",    required_argument,    NULL,   'h'},
     {"padding",   required_argument,    NULL,   'p'},
+    {"font",      required_argument,    NULL,   'f'},
     {NULL,        0,                    NULL,   0}
 };
 
@@ -48,6 +50,7 @@ void usage(char *execName)
     fprintf(stderr, "    --text,-t: text to put on banner\n");
     fprintf(stderr, "    --height,-h: height of banner\n");
     fprintf(stderr, "    [--padding,-p]: padding around banner text\n");
+    fprintf(stderr, "    [--font,-f]: font to use (defaults to 'Arial-BoldMT')\n");
     fprintf(stderr, "  example:\n");
     fprintf(stderr, "    %s -i input.png -o output.png --text 1.2.0 -h 19.0\n", basename(execName));
 }
@@ -65,7 +68,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     {
         int option_index = 0;
         
-        switch(getopt_long(argc, (char **)argv, "i:o:t:h:p:", long_options, &option_index))
+        switch(getopt_long(argc, (char **)argv, "i:o:t:h:p:f:", long_options, &option_index))
         {
             case -1:
             {
@@ -95,6 +98,11 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
             case 'p':
             {
                 overlayContext.bannerHeightPadding = optarg == nil ? -1.0 : atof(optarg);
+            } break;
+                
+            case 'f':
+            {
+                overlayContext.fontName = optarg == nil ? DEFAULT_FONT_TO_USE : [NSString stringWithFormat:@"%s", optarg];
             } break;
 
             case '?':
@@ -139,6 +147,11 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
         fprintf(stderr, "padding value could not be parsed.\n");
         usage((char*)argv[0]);
         optionError = YES;
+    }
+    
+    if(!optionError && overlayContext.fontName == nil)
+    {
+        overlayContext.fontName = DEFAULT_FONT_TO_USE;
     }
     
     if(!optionError)
