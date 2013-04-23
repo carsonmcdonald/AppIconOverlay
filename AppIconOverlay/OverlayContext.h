@@ -27,5 +27,6 @@
 @property (nonatomic, assign) CGContextRef workingContext;
 @property (nonatomic, assign) CGContextRef bannerContext;
 @property (nonatomic, copy) NSString *outputFilename;
+@property (nonatomic, copy) NSString *fontName;
 
 @end
