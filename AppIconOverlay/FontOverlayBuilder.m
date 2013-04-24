@@ -33,10 +33,10 @@
     return self;
 }
 
-- (bool)willStringFit:(NSString *)versionNumber withSize:(CGSize) size withMaxLabelLength:(double)maxLabelLength withHeightPadding:(double) heightPadding withFontSize:(double) fontSize withImageSize:(CGSize) imageSize withFontName:(NSString *)fontName
+- (CFMutableAttributedStringRef)createAttributedStringUsingFont:(NSString *)fontName withFontSize:(double)fontSize withTextString:(NSString *)textString
 {
     CFMutableAttributedStringRef attrStr = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-    CFAttributedStringReplaceString (attrStr, CFRangeMake(0, 0), (CFStringRef) versionNumber);
+    CFAttributedStringReplaceString (attrStr, CFRangeMake(0, 0), (CFStringRef)textString);
     CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)fontName, fontSize, NULL);
     CTTextAlignment alignment = kCTCenterTextAlignment;
     CTParagraphStyleSetting _settings[] = { {kCTParagraphStyleSpecifierAlignment, sizeof(alignment), &alignment} };
@@ -46,6 +46,13 @@
     CFAttributedStringSetAttribute(attrStr, CFRangeMake(0, CFAttributedStringGetLength(attrStr)), kCTForegroundColorAttributeName, CGColorCreateGenericRGB(1.0, 1.0, 1.0, 1.0));
     CFRelease(paragraphStyle);
     CFRelease(font);
+    
+    return attrStr;
+}
+
+- (bool)willStringFit:(NSString *)versionNumber withSize:(CGSize) size withMaxLabelLength:(double)maxLabelLength withHeightPadding:(double) heightPadding withFontSize:(double) fontSize withImageSize:(CGSize) imageSize withFontName:(NSString *)fontName
+{
+    CFMutableAttributedStringRef attrStr = [self createAttributedStringUsingFont:fontName withFontSize:fontSize withTextString:versionNumber];
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(attrStr);
     
@@ -81,17 +88,7 @@
     NSLog(@"Final font size: %f", finalFontSize);
 #endif
     
-    CFMutableAttributedStringRef attrStr = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
-    CFAttributedStringReplaceString (attrStr, CFRangeMake(0, 0), (CFStringRef) overlayContext.bannerText);
-    CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)overlayContext.fontName, finalFontSize, NULL);
-    CTTextAlignment alignment = kCTCenterTextAlignment;
-    CTParagraphStyleSetting _settings[] = { {kCTParagraphStyleSpecifierAlignment, sizeof(alignment), &alignment} };
-    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(_settings, sizeof(_settings) / sizeof(_settings[0]));
-    CFAttributedStringSetAttribute(attrStr, CFRangeMake(0, CFAttributedStringGetLength(attrStr)), kCTParagraphStyleAttributeName, paragraphStyle);
-    CFAttributedStringSetAttribute(attrStr, CFRangeMake(0, CFAttributedStringGetLength(attrStr)), kCTFontAttributeName, font);
-    CFAttributedStringSetAttribute(attrStr, CFRangeMake(0, CFAttributedStringGetLength(attrStr)), kCTForegroundColorAttributeName, CGColorCreateGenericRGB(1.0, 1.0, 1.0, 1.0));
-    CFRelease(paragraphStyle);
-    CFRelease(font);
+    CFMutableAttributedStringRef attrStr = [self createAttributedStringUsingFont:overlayContext.fontName withFontSize:finalFontSize withTextString:overlayContext.bannerText];
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(attrStr);
     
