@@ -21,10 +21,10 @@ Options
 Example Output
 ==============
 
-![example 144](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-144.png "example 144")
-![example 114](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-114.png "example 114")
-![example 72](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-72.png "example 72")
-![example 57](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-57.png "example 57")
+![example 144](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-144.png "example 144") &nbsp;
+![example 114](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-114.png "example 114") &nbsp;
+![example 72](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-72.png "example 72") &nbsp;
+![example 57](https://raw.github.com/carsonmcdonald/AppIconOverlay/master/examples/example-57.png "example 57") &nbsp;
 
 The above examples where created using the following command:
 
