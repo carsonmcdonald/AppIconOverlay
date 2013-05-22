@@ -59,8 +59,9 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
 {
     OverlayContext *overlayContext = [[OverlayContext alloc] init];
     
-    CGFloat bannerHeight = -1.0;
-    NSString *inputFilename = nil;
+    overlayContext.bannerHeight = -1.0;
+    NSMutableArray *inputFilenames = [[NSMutableArray alloc] init];
+    NSMutableArray *outputFilenames = [[NSMutableArray alloc] init];
     bool optionError = NO;
     
     bool done = NO;
@@ -77,12 +78,28 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
                 
             case 'i':
             {
-                inputFilename = optarg == nil ? nil : [NSString stringWithFormat:@"%s", optarg];
+                if(optarg != nil)
+                {
+                    NSString *names = [NSString stringWithFormat:@"%s", optarg];
+                    [[names componentsSeparatedByString:@","] enumerateObjectsUsingBlock:^(NSString *inputFilename, NSUInteger idx, BOOL *stop) {
+                        
+                        [inputFilenames addObject:[inputFilename stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+                        
+                    }];
+                }
             } break;
                 
             case 'o':
             {
-                overlayContext.outputFilename = optarg == nil ? nil : [NSString stringWithFormat:@"%s", optarg];
+                if(optarg != nil)
+                {
+                    NSString *names = [NSString stringWithFormat:@"%s", optarg];
+                    [[names componentsSeparatedByString:@","] enumerateObjectsUsingBlock:^(NSString *outputFilename, NSUInteger idx, BOOL *stop) {
+                        
+                        [outputFilenames addObject:[outputFilename stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+                        
+                    }];
+                }
             } break;
                 
             case 't':
@@ -92,7 +109,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
                 
             case 'h':
             {
-                bannerHeight = optarg == nil ? -1.0 : atof(optarg);
+                overlayContext.bannerHeight = optarg == nil ? -1.0 : atof(optarg);
             } break;
                 
             case 'p':
@@ -104,7 +121,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
             {
                 overlayContext.fontName = optarg == nil ? DEFAULT_FONT_TO_USE : [NSString stringWithFormat:@"%s", optarg];
             } break;
-
+                
             case '?':
             default:
             {
@@ -115,18 +132,26 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
         }
     } while(!done);
     
-    if(!optionError && inputFilename == nil)
+    if(!optionError && inputFilenames.count == 0)
     {
-        fprintf(stderr, "input is a required option.\n");
+        fprintf(stderr, "at least one input file is a required.\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
+    else
+    {
+        overlayContext.inputFilenames = inputFilenames;
+    }
     
-    if(!optionError && overlayContext.outputFilename == nil)
+    if(!optionError && outputFilenames.count != overlayContext.inputFilenames.count)
     {
         fprintf(stderr, "output is a required option.\n");
         usage((char*)argv[0]);
         optionError = YES;
+    }
+    else
+    {
+        overlayContext.outputFilenames = outputFilenames;
     }
     
     if(!optionError && overlayContext.bannerText == nil)
@@ -136,7 +161,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
         optionError = YES;
     }
     
-    if(!optionError && bannerHeight == -1.0)
+    if(!optionError && overlayContext.bannerHeight == -1.0)
     {
         fprintf(stderr, "height is a required option.\n");
         optionError = YES;
@@ -156,19 +181,6 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     
     if(!optionError)
     {
-        if(![CGUtils readImageFromFilename:inputFilename intoOverlayContext:overlayContext])
-        {
-            fprintf(stderr, "Could not read input file: %s.\n", inputFilename.UTF8String);
-            optionError = YES;
-        }
-    }
-    
-    if(!optionError)
-    {
-        overlayContext.bannerSize = CGSizeMake(overlayContext.inputImageSize.width, bannerHeight);
-        
-        overlayContext.bannerContext = [CGUtils createBitmapContextWithSize:overlayContext.bannerSize];
-        
         return overlayContext;
     }
 
@@ -177,34 +189,50 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-    int exitCode = 0;
+    __block int exitCode = 0;
     
     @autoreleasepool
     {
         OverlayContext *overlayContext = configureOverlayContext(argc, argv);
         if(overlayContext != nil)
         {
-            BannerOverlayBuilder *bannerOverlayBuilder = [[BannerOverlayBuilder alloc] initWithOverlayContext:overlayContext];
-            
-            FontOverlayBuilder *fontOverlayBuilder = [[FontOverlayBuilder alloc] initWithOverlayContext:overlayContext];
-            
-            [bannerOverlayBuilder createGradientOverlayBanner];
-            
-            bool textDidFit = [fontOverlayBuilder drawTextOverlay];
-            
-            [bannerOverlayBuilder rotateOverlayBannerAndApplyToFinalImage];
-            
-            [CGUtils writeImageFromContext:overlayContext toFilename:overlayContext.outputFilename];
-            
-            if(textDidFit)
-            {
-                exitCode = 0;
-            }
-            else
-            {
-                fprintf(stderr, "WARNING: Full text did not fit into banner.\n");
-                exitCode = 2;
-            }
+            [overlayContext.inputFilenames enumerateObjectsUsingBlock:^(NSString *inputFilename, NSUInteger inputFilenameIndex, BOOL *stop) {
+                
+                if(![CGUtils readImageFromFilename:inputFilename intoOverlayContext:overlayContext])
+                {
+                    fprintf(stderr, "Could not read input file: %s.\n", inputFilename.UTF8String);
+                    exitCode = 1;
+                }
+                else
+                {
+                    overlayContext.bannerSize = CGSizeMake(overlayContext.inputImageSize.width, overlayContext.bannerHeight);
+                    
+                    overlayContext.bannerContext = [CGUtils createBitmapContextWithSize:overlayContext.bannerSize];
+                    
+                    BannerOverlayBuilder *bannerOverlayBuilder = [[BannerOverlayBuilder alloc] initWithOverlayContext:overlayContext];
+                    
+                    FontOverlayBuilder *fontOverlayBuilder = [[FontOverlayBuilder alloc] initWithOverlayContext:overlayContext];
+                    
+                    [bannerOverlayBuilder createGradientOverlayBanner];
+                    
+                    bool textDidFit = [fontOverlayBuilder drawTextOverlay];
+                    
+                    [bannerOverlayBuilder rotateOverlayBannerAndApplyToFinalImage];
+                    
+                    [CGUtils writeImageFromContext:overlayContext toFilename:overlayContext.outputFilenames[inputFilenameIndex]];
+                    
+                    if(textDidFit)
+                    {
+                        exitCode = 0;
+                    }
+                    else
+                    {
+                        fprintf(stderr, "WARNING: Full text did not fit into banner.\n");
+                        exitCode = 2;
+                    }
+                }
+                
+            }];
         }
         else
         {

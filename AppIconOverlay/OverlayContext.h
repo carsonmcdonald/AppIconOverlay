@@ -21,12 +21,14 @@
 @interface OverlayContext : NSObject
 
 @property (nonatomic, copy) NSString *bannerText;
+@property (nonatomic, assign) CGFloat bannerHeight;
 @property (nonatomic, assign) CGFloat bannerHeightPadding;
 @property (nonatomic, assign) CGSize inputImageSize;
 @property (nonatomic, assign) CGSize bannerSize;
 @property (nonatomic, assign) CGContextRef workingContext;
 @property (nonatomic, assign) CGContextRef bannerContext;
-@property (nonatomic, copy) NSString *outputFilename;
 @property (nonatomic, copy) NSString *fontName;
+@property (nonatomic, copy) NSArray *outputFilenames;
+@property (nonatomic, copy) NSArray *inputFilenames;
 
 @end
