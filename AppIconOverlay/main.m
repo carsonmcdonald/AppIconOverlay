@@ -51,8 +51,9 @@ void usage(char *execName)
     fprintf(stderr, "    --height,-h: height of banner\n");
     fprintf(stderr, "    [--padding,-p]: padding around banner text\n");
     fprintf(stderr, "    [--font,-f]: font to use (defaults to 'Arial-BoldMT')\n");
-    fprintf(stderr, "  example:\n");
+    fprintf(stderr, "  examples:\n");
     fprintf(stderr, "    %s -i input.png -o output.png --text 1.2.0 -h 19.0\n", basename(execName));
+    fprintf(stderr, "    %s -i \"input1.png, input2.png\" -o \"output1.png, output2.png\" --text 1.2.0 -h 19.0\n", basename(execName));
 }
 
 OverlayContext *configureOverlayContext(int argc, const char *argv[])
