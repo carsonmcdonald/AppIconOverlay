@@ -6,7 +6,7 @@ Create an overlay on top of your app icon
 Options
 =======
 
-**--input,-i**: image file to read in
+**--input,-i**: image file to read in. You can specify more than one file to input and output, when done the inputs will be matched to the outputs so there must be the same number of each.
 
 **--output,-o**: output image file
 
