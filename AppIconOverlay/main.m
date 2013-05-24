@@ -144,7 +144,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
         overlayContext.inputFilenames = inputFilenames;
     }
     
-    if(!optionError && outputFilenames.count != overlayContext.inputFilenames.count)
+    if(!optionError && outputFilenames.count == 0)
     {
         fprintf(stderr, "output is a required option.\n");
         usage((char*)argv[0]);
@@ -153,6 +153,13 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     else
     {
         overlayContext.outputFilenames = outputFilenames;
+    }
+    
+    if(overlayContext.outputFilenames.count != overlayContext.inputFilenames.count)
+    {
+        fprintf(stderr, "the number of output and input files must match.\n");
+        usage((char*)argv[0]);
+        optionError = YES;
     }
     
     if(!optionError && overlayContext.bannerText == nil)
