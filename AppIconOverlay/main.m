@@ -135,7 +135,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     
     if(!optionError && inputFilenames.count == 0)
     {
-        fprintf(stderr, "at least one input file is a required.\n");
+        fprintf(stderr, "\nERROR: At least one input file is required.\n\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
@@ -146,7 +146,7 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     
     if(!optionError && outputFilenames.count == 0)
     {
-        fprintf(stderr, "output is a required option.\n");
+        fprintf(stderr, "\nERROR: At least one output is required.\n\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
@@ -157,27 +157,27 @@ OverlayContext *configureOverlayContext(int argc, const char *argv[])
     
     if(overlayContext.outputFilenames.count != overlayContext.inputFilenames.count)
     {
-        fprintf(stderr, "the number of output and input files must match.\n");
+        fprintf(stderr, "\nERROR: The number of output and input files must match.\n\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
     
     if(!optionError && overlayContext.bannerText == nil)
     {
-        fprintf(stderr, "text is a required option.\n");
+        fprintf(stderr, "\nERROR: Text is a required option.\n\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
     
     if(!optionError && overlayContext.bannerHeight == -1.0)
     {
-        fprintf(stderr, "height is a required option.\n");
+        fprintf(stderr, "\nERROR: Height is a required option.\n\n");
         optionError = YES;
     }
     
     if(!optionError && overlayContext.bannerHeightPadding == -1.0)
     {
-        fprintf(stderr, "padding value could not be parsed.\n");
+        fprintf(stderr, "\nERROR: Padding value could not be parsed.\n\n");
         usage((char*)argv[0]);
         optionError = YES;
     }
@@ -208,7 +208,7 @@ int main(int argc, const char *argv[])
                 
                 if(![CGUtils readImageFromFilename:inputFilename intoOverlayContext:overlayContext])
                 {
-                    fprintf(stderr, "Could not read input file: %s.\n", inputFilename.UTF8String);
+                    fprintf(stderr, "\nERROR: Could not read input file: %s.\n\n", inputFilename.UTF8String);
                     exitCode = 1;
                 }
                 else
